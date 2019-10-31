@@ -17,13 +17,13 @@ module.exports = function(context) {
 		cfg = new ConfigParser(xml),
 		packageName = cfg.packageName();
 
-		var dir = 'platforms/android/res/drawable';
+		var dir = 'platforms/android/app/src/main/res/drawable';
 
 		if (!fs.existsSync(dir)){
 			fs.mkdirSync(dir);
 		}
 
-		dir = 'platforms/android/res/xml';
+		dir = 'platforms/android/app/src/main/res/xml';
 
 		if (!fs.existsSync(dir)){
 			fs.mkdirSync(dir);
@@ -34,7 +34,7 @@ module.exports = function(context) {
 				process.emitWarning('icons folder does not exist');
 				process.exit(1);
 			}
-			fse.copySync('android-shortcuts/icons', 'platforms/android/res/drawable')
+			fse.copySync('android-shortcuts/icons', 'platforms/android/app/src/main/res/drawable')
 		} catch (err) {
 			process.emitWarning('Copying android-shortcuts icons failure');
 			process.emitWarning(err);
@@ -44,20 +44,20 @@ module.exports = function(context) {
 		var shortcutHelperFile = fs.readFileSync(context.opts.plugin.dir+'/src/android/ShortcutHelperActivity.java','utf8');
 		shortcutHelperFile = shortcutHelperFile.replace('%CORDOVA_MAIN_PACKAGE%', packageName);
 		var packageNameDIR = packageName.replace(/\./g, '/')
-		fs.writeFileSync('platforms/android/src/'+packageNameDIR+'/ShortcutHelperActivity.java', shortcutHelperFile);
+		fs.writeFileSync('platforms/android/app/src/main/java/'+packageNameDIR+'/ShortcutHelperActivity.java', shortcutHelperFile);
 		
-		var pluginFile = fs.readFileSync('platforms/android/src/cl/kunder/androidshortcuts/AndroidShortcutsPlugin.java','utf8');
+		var pluginFile = fs.readFileSync('platforms/android/app/src/main/java/cl/kunder/androidshortcuts/AndroidShortcutsPlugin.java','utf8');
 		pluginFile = pluginFile.replace('%CORDOVA_MAIN_PACKAGE%', packageName);
-		fs.writeFileSync('platforms/android/src/cl/kunder/androidshortcuts/AndroidShortcutsPlugin.java', pluginFile);
+		fs.writeFileSync('platforms/android/app/src/main/java/cl/kunder/androidshortcuts/AndroidShortcutsPlugin.java', pluginFile);
 		
-		var androidManifestFile = fs.readFileSync('platforms/android/AndroidManifest.xml', 'utf-8');
+		var androidManifestFile = fs.readFileSync('platforms/android/app/src/main/AndroidManifest.xml', 'utf-8');
 		if(androidManifestFile.indexOf('android:name="android.app.shortcuts"') === -1) {
 			androidManifestFile = androidManifestFile.replace('</intent-filter>', '</intent-filter>\n\t\t\t<meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />');
-			fs.writeFileSync('platforms/android/AndroidManifest.xml', androidManifestFile);
+			fs.writeFileSync('platforms/android/app/src/main/AndroidManifest.xml', androidManifestFile);
 		}
 
 		var shortcutsXML = '<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">';
-		var stringFile = fs.readFileSync('platforms/android/res/values/strings.xml','utf8');
+		var stringFile = fs.readFileSync('platforms/android/app/src/main/res/values/strings.xml','utf8');
 		var i = 1;
 		
 		for(var shortcut of android_shortcuts_json.shortcuts) {
@@ -98,7 +98,7 @@ module.exports = function(context) {
 			i++;
 		}
 		shortcutsXML = shortcutsXML + '\n</shortcuts>';
-		fs.writeFileSync('platforms/android/res/values/strings.xml', stringFile);
-		fs.writeFileSync('platforms/android/res/xml/shortcuts.xml', shortcutsXML);
+		fs.writeFileSync('platforms/android/app/src/main/res/values/strings.xml', stringFile);
+		fs.writeFileSync('platforms/android/app/src/main/res/xml/shortcuts.xml', shortcutsXML);
 	}
 };
